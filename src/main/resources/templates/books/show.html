@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${book.getName()}">Show Person</title>
+</head>
+<style>
+
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #F2F2F2;
+    }
+
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .back {
+        padding: 20px 40px;
+        border: 2px solid #B0C4DE;
+        border-radius: 8px;
+        background-color: white;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), 0 6px 6px rgba(0, 0, 0, 0.1);
+        max-width: 800px;
+        width: 100%;
+    }
+
+    .book_info p {
+        margin: 0;
+        font-size: 18px;
+        line-height: 1.4;
+    }
+
+    .btn {
+        display: inline-block;
+        background-color: #C0C0C0;
+        text-decoration: none;
+        color: black;
+        padding: 5px 16px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+        margin: 5px;
+    }
+
+    .btn:hover {
+        background-color: #A9A9A9;
+    }
+
+    .btn:last-child {
+        margin-right: 0;
+    }
+
+    .person_info {
+        font-size: 20px;
+        padding-bottom: 5px;
+    }
+
+</style>
+<body>
+<div class="container">
+    <div class="back center">
+        <h2 th:text="${book.getName()} + ', ' + ${book.getAuthor()} + ', ' + ${book.getYear()}"/>
+
+        <div th:unless="${owner == null}">
+            <form th:action="@{{id}/return(id=${book.getId()})}" method="post">
+                <hr/>
+                <div class="person_info" th:text="'Now this book is in: ' + ${owner.getName()}" />
+                <input type="submit" value="Return the book" class="btn">
+                <hr/>
+            </form>
+        </div>
+
+        <div th:if="${owner == null}" >
+            <form th:action="@{{id}/get(id=${book.getId()})}" method="post">
+                <hr/>
+                <div class="person_info" th:text="'Now this book is available. Who will get it?'" />
+
+                <label text="Choose a person: " for="personId"/>
+                <select id="personId" name="personId">
+                    <option th:each="person : ${people}" th:value="${person.getId()}" th:text="${person.getName()}" />
+                </select>
+                <input type="submit" value="Get the book" class="btn">
+
+                <hr/>
+            </form>
+        </div>
+
+        <a th:href="@{/books/{id}/edit(id=${book.getId()})}" th:text="Edit" class="btn"/>
+
+        <br/>
+        <form th:action="@{{id}/delete(id=${book.getId()})}" th:method="post">
+            <input type="submit" value="Delete" class="btn"/>
+            <a th:href="@{/books}" class="btn">Back</a>
+        </form>
+    </div>
+</div>
+</body>
+</html>

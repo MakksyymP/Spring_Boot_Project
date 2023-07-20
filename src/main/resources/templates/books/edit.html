@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Update Book</title>
+</head>
+<style>
+
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #F2F2F2;
+    }
+
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .back {
+        padding: 50px;
+        border: 2px solid #B0C4DE;
+        border-radius: 8px;
+        background-color: white;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), 0 6px 6px rgba(0, 0, 0, 0.1);
+        max-width: 800px;
+        width: 30%;
+    }
+
+    input[type=text] {
+        border: none;
+        border-bottom: 2px solid #B0C4DE;
+        outline: none;
+        margin-bottom: 20px;
+        padding: 10px;
+        font-size: 16px;
+    }
+
+    label {
+        display: block;
+        font-size: 18px;
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+
+    .book_info p {
+        margin: 0;
+        font-size: 18px;
+        line-height: 1.4;
+    }
+
+    .btn {
+        display: inline-block;
+        background-color: #C0C0C0;
+        text-decoration: none;
+        color: black;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+        margin-right: 10px;
+    }
+
+    .btn:hover {
+        background-color: #A9A9A9;
+    }
+
+    .btn:last-child {
+        margin-right: 0;
+    }
+
+</style>
+<body>
+<div class="container">
+    <div class="back center">
+        <form th:action="@{update(id=${book.getId()})}" th:method="post" th:object="${book}">
+            <label for="name">Enter the Name: </label>
+            <input type="text" th:field="*{name}" id="name">
+            <div style="color: red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}" />
+            <br/><br/>
+            <label for="author">Enter the Author: </label>
+            <input type="text" th:field="*{author}" id="author">
+            <div style="color: red" th:if="${#fields.hasErrors('author')}" th:errors="*{author}" />
+            <br/><br/>
+            <label for="birthYear">Enter the Year of issue: </label>
+            <input type="text" th:field="*{year}" id="birthYear">
+            <div style="color: red" th:if="${#fields.hasErrors('year')}" th:errors="*{year}" />
+
+            <br/>
+            <hr/>
+
+            <input type="submit" value="Update" class="btn"/>
+        </form>
+    </div>
+</div>
+</body>
+</html>

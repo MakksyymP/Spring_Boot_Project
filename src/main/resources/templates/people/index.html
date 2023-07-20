@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>All peoples</title>
+</head>
+<style>
+
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #F2F2F2;
+  }
+
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .back {
+    padding: 50px;
+    border: 2px solid #B0C4DE;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), 0 6px 6px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    width: 100%;
+  }
+
+  .person_back {
+    display: block;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #EFEFEF;
+    color: #333;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .book_info p {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.4;
+  }
+
+  .btn {
+    display: inline-block;
+    background-color: #C0C0C0;
+    text-decoration: none;
+    color: black;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    margin-right: 10px;
+  }
+
+  .btn:hover {
+    background-color: #A9A9A9;
+  }
+
+  .btn:last-child {
+    margin-right: 0;
+  }
+
+</style>
+<body>
+<div class="container">
+  <div class="back center">
+    <h2>List of people</h2>
+    <div th:each="person : ${people}">
+      <a class="person_back" th:text="${person.getName() + ', ' + person.getYear()}"
+         th:href="@{/people/{id}(id=${person.getId()})}"/>
+    </div>
+
+    <br/>
+    <hr/>
+
+    <a href="/people/new" class="btn">Create new person</a>
+    <a href="../main" class="btn">Back</a>
+  </div>
+</div>
+</body>
+</html>
