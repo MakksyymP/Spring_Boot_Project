@@ -1,0 +1,15 @@
+version: '3'
+services:
+  libarary:
+    image: postgres:16
+    ports:
+      - "5565:5432"
+    environment:
+      POSTGRES_PASSWORD: root
+      POSTGRES_USER: postgres
+      POSTGRES_DB: library_db
+
+  frontend:
+    build: templates/.
+    ports:
+      - "9091:80"

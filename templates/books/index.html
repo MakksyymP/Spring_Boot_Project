@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bookshelf</title>
+
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://bootswatch.com/4/darkly/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .btn-primary, .page-item a {
+            background-color: #345870;
+            user-select: none;
+            color: #FFFFFF;
+        }
+
+        .btn-primary:hover, .page-item a:hover {
+            background-color:#28415b;
+        }
+
+        .book-info {
+            background-color: #343a40;
+            border: 1px solid #212529;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .book-info h3 {
+            font-size: 24px;
+            color: #fff;
+        }
+
+        .book-info p {
+            font-size: 18px;
+            color: #e9ecef;
+            margin: 10px 0;
+        }
+
+        .page-link {
+            user-select: none;
+        }
+
+        .dropdown-item {
+            user-select: none;
+        }
+
+        .navbar {
+            user-select: none;
+        }
+
+
+
+        .page-item.disabled .page-link {
+            background-color: #28415b;
+            pointer-events: none;
+            color: #888;
+        }
+
+        .page-item.active .page-link {
+            background-color: #28415b;
+            pointer-events: none;
+            color: #888;
+        }
+
+
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-darkly">
+    <a class="navbar-brand" href="#">Bookshelf</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/books">Books</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/authors">Authors</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="container mt-4">
+    <div class="back center">
+        <h2>Bookshelf</h2>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="btn-group" role="group" aria-label="Sort Dropdown">
+                <a type="button" class="change-direction btn btn-primary"><img id="directionImage" src="../img/sort_asc.png" alt="↓↑" width="25" height="25"></a>
+                <div class="btn-group" role="group">
+                    <a id="sortDropdown" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Sort By
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="sortDropdown">
+                        <a class="change-sort dropdown-item" href="#" data-sort="id">Id</a>
+                        <a class="change-sort dropdown-item" href="#" data-sort="name">Name</a>
+                        <a class="change-sort dropdown-item" href="#" data-sort="author">Author</a>
+                        <a class="change-sort dropdown-item" href="#" data-sort="year">Year</a>
+                    </div>
+                </div>
+            </div>
+            <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+                <button type="button" class="btn btn-primary" style="pointer-events: none"><img src="../img/books.png" width="25" height="25" alt="Books"></button>
+                <div class="btn-group" role="group">
+                    <a id="itemsPerPageDropdown" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Books per page
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="itemsPerPageDropdown">
+                        <a class="change-size dropdown-item" href="#" data-size="3">3</a>
+                        <a class="change-size dropdown-item" href="#" data-size="5">5</a>
+                        <a class="change-size dropdown-item" href="#" data-size="10">10</a>
+                        <a class="change-size dropdown-item" href="#" data-size="15">15</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="book-list">
+        </div>
+    </div>
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center" id="pagination">
+        </ul>
+    </nav>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        var currentPage = 0;
+        var itemsPerPage = 3;
+        var totalPageCount = 0;
+        var sortBy = 'id';
+        var sortDirection = 'ASC';
+
+        function updatePage(page, size, sort, direction) {
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:8080/books?page=" + page + "&size=" + size + "&sort=" + sort + "&direction=" + direction,
+                success: function (data) {
+                    var books = data.books;
+
+                    $('#book-list').empty();
+
+                    books.forEach(function (book) {
+                        var bookHtml = '<div class="book-info">' +
+                            '<h3>' + book.name + '</h3>' +
+                            '<p>Author: ' + book.author + '</p>' +
+                            '<p>Year: ' + book.year + '</p>' +
+                            '</div>';
+                        $('#book-list').append(bookHtml);
+                    });
+
+                    updatePagination(data.numbers);
+                }
+            });
+        }
+
+        function loadPage(page) {
+            currentPage = page;
+            updatePage(page, itemsPerPage, sortBy, sortDirection);
+        }
+
+        $('.change-size').click(function () {
+            itemsPerPage = $(this).data('size');
+            loadPage(0);
+        });
+
+        $('.change-sort').click(function () {
+            sortBy = $(this).data('sort');
+            loadPage(0);
+        });
+
+        $('.change-direction').click(function () {
+            sortDirection = sortDirection === 'ASC' ? 'DESC' : 'ASC';
+
+            var image = document.getElementById('directionImage')
+            if (sortDirection === 'ASC') {
+                image.src = '../img/sort_asc.png';
+            } else {
+                image.src = '../img/sort_desc.png';
+            }
+
+            loadPage(0);
+        });
+
+        $('#sort-form').submit(function (e) {
+            e.preventDefault();
+            loadPage(0);
+        });
+
+
+        function updatePagination(numbers) {
+            var pagination = $('#pagination');
+            pagination.empty();
+
+            totalPageCount = numbers.length;
+
+            if (totalPageCount <= 1) {
+                return;
+            }
+
+            var prevPage = currentPage > 0 ? currentPage - 1 : 0;
+            var nextPage = currentPage < totalPageCount - 1 ? currentPage + 1 : totalPageCount - 1;
+
+            var prevLink = '<li class="page-item' + (currentPage === 0 ? ' disabled' : '') + '"><a class="page-link" href="#">&laquo;</a></li>';
+            var nextLink = '<li class="page-item' + (currentPage === totalPageCount - 1 ? ' disabled' : '') + '"><a class="page-link" href="#">&raquo;</a></li>';
+
+            pagination.append(prevLink);
+            for (var i = 0; i < totalPageCount; i++) {
+                var pageNumber = i;
+                var pageLink = '<li class="page-item' + (i === currentPage ? ' active' : '') + '"><a class="page-link' + (i === currentPage ? ' disabled' : '') + '" href="#">' + (pageNumber + 1) + '</a></li>';
+                pagination.append(pageLink);
+
+                (function (page) {
+                    pagination.find('a:contains("' + (pageNumber + 1) + '")').click(function () {
+                        loadPage(page);
+                    });
+                })(i);
+            }
+            pagination.append(nextLink);
+
+            pagination.find('a:contains("«")').click(function () {
+                if (currentPage > 0) {
+                    loadPage(prevPage);
+                }
+            });
+            pagination.find('a:contains("»")').click(function () {
+                if (currentPage < totalPageCount - 1) {
+                    loadPage(nextPage);
+                }
+            });
+        }
+
+        loadPage(currentPage, itemsPerPage);
+    });
+</script>
+
+
+</body>
+</html>
