@@ -4,13 +4,12 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ua.library.example.LibraryBootApp.dto.books.ResponseBookDto;
 import ua.library.example.LibraryBootApp.models.Book;
 import ua.library.example.LibraryBootApp.service.BooksService;
 import ua.library.example.LibraryBootApp.service.PeopleService;
@@ -18,9 +17,11 @@ import ua.library.example.LibraryBootApp.service.PeopleService;
 import java.util.stream.IntStream;
 
 
-@Controller
+@RestController
 @RequestMapping("/books")
+@CrossOrigin(origins = "http://localhost:9091")
 public class BookController {
+
     private final BooksService booksService;
     private final PeopleService peopleService;
 
@@ -30,25 +31,24 @@ public class BookController {
         this.peopleService = peopleService;
     }
 
-    @GetMapping()
-    public String index(Model model,
-                        @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-                        @RequestParam(value = "size", required = false, defaultValue = "3") int size,
-                        @RequestParam(value = "sort", required = false, defaultValue = "id") String sort) {
+    @GetMapping
+    public ResponseEntity<?> index(
+            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "3") int size,
+            @RequestParam(value = "sort", required = false, defaultValue = "id") String sort,
+            @RequestParam(value = "direction", required = false, defaultValue = "asc") String direction) {
 
-        Page<Book> pageBooks = null;
-
-        if (sort.equals("id") | sort.equals("year")){
-            pageBooks = booksService.index(PageRequest.of(page, size, Sort.Direction.DESC, sort));
-        } else {
+        Page<Book> pageBooks;
+        if (direction.equalsIgnoreCase("asc")) {
             pageBooks = booksService.index(PageRequest.of(page, size, Sort.Direction.ASC, sort));
+        } else {
+            pageBooks = booksService.index(PageRequest.of(page, size, Sort.Direction.DESC, sort));
         }
 
-        model.addAttribute("books", pageBooks);
-        model.addAttribute("numbers", IntStream.range(0, pageBooks.getTotalPages()).toArray());
-        model.addAttribute("sort", sort);
-        return "books/index";
+        ResponseBookDto bookPageDTO = new ResponseBookDto(pageBooks.getContent(), IntStream.range(0, pageBooks.getTotalPages()).toArray(), sort);
+        return ResponseEntity.ok(bookPageDTO);
     }
+
 
     @GetMapping("{id}")
     public String show(@PathVariable("id") int id , Model model) {

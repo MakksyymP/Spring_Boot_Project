@@ -1,6 +1,7 @@
 package ua.library.example.LibraryBootApp.models;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
@@ -29,6 +30,7 @@ public class Person {
     private int year;
 
     @OneToMany(mappedBy = "owner")
+    @JsonIgnore
     private List<Book> books;
 
     public Person() {
