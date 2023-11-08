@@ -1,16 +1,16 @@
 CREATE TABLE Persons
 (
     id serial PRIMARY KEY,
-    fullname VARCHAR(50) NOT NULL,
+    fullname VARCHAR(50) NOT NULL UNIQUE,
     birthyear INT
 );
 
 CREATE TABLE Books
 (
     id serial PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
+    name VARCHAR(50) NOT NULL UNIQUE,
     author VARCHAR(50) NOT NULL,
-    issueyear INT,
+    issueyear INT NOT NULL,
     order_time TIMESTAMPTZ,
     person_id INT REFERENCES Persons(id)
 );

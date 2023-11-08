@@ -8,6 +8,22 @@
     <link href="https://bootswatch.com/4/darkly/bootstrap.min.css" rel="stylesheet">
 
     <style>
+        .read-more {
+            background-color: #345870;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            text-decoration: none;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .read-more:hover {
+            background-color: #28415b;
+        }
+
+
         .btn-primary, .page-item a {
             background-color: #345870;
             user-select: none;
@@ -68,20 +84,28 @@
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-darkly">
-    <a class="navbar-brand" href="#">Bookshelf</a>
+    <a class="navbar-brand" href="http://localhost:9091/">Bookshelf</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" href="/">Home</a>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle show" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="true">Books</a>
+                <div class="dropdown-menu" data-popper="static">
+                    <a class="dropdown-item" href="http://localhost:9091/books/">Book list</a>
+                    <a class="dropdown-item" href="http://localhost:9091/books/create.html">Add new book</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle show" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">People</a>
+                <div class="dropdown-menu" data-popper="static">
+                    <a class="dropdown-item" href="http://localhost:9091/people/">People list</a>
+                    <a class="dropdown-item" href="http://localhost:9091/people/create.html">Add new person</a>
+                </div>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/books">Books</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/authors">Authors</a>
+                <a class="nav-link" href="http://localhost:9091/search/">Search</a>
             </li>
         </ul>
     </div>
@@ -97,7 +121,7 @@
                         Sort By
                     </a>
                     <div class="dropdown-menu" aria-labelledby="sortDropdown">
-                        <a class="change-sort dropdown-item" href="#" data-sort="id">Id</a>
+                        <a class="change-sort dropdown-item" href="#" data-sort="id">Newest/Oldest</a>
                         <a class="change-sort dropdown-item" href="#" data-sort="name">Name</a>
                         <a class="change-sort dropdown-item" href="#" data-sort="author">Author</a>
                         <a class="change-sort dropdown-item" href="#" data-sort="year">Year</a>
@@ -136,26 +160,26 @@
 
 <script>
     $(document).ready(function () {
-        var currentPage = 0;
-        var itemsPerPage = 3;
-        var totalPageCount = 0;
-        var sortBy = 'id';
-        var sortDirection = 'ASC';
+        let currentPage = 0;
+        let itemsPerPage = 3;
+        let totalPageCount = 0;
+        let sortBy = 'id';
+        let sortDirection = 'ASC';
 
         function updatePage(page, size, sort, direction) {
             $.ajax({
                 type: "GET",
                 url: "http://localhost:8080/books?page=" + page + "&size=" + size + "&sort=" + sort + "&direction=" + direction,
                 success: function (data) {
-                    var books = data.books;
+                    const books = data.books;
 
                     $('#book-list').empty();
 
                     books.forEach(function (book) {
-                        var bookHtml = '<div class="book-info">' +
+                        const bookHtml = '<div class="book-info">' +
                             '<h3>' + book.name + '</h3>' +
                             '<p>Author: ' + book.author + '</p>' +
-                            '<p>Year: ' + book.year + '</p>' +
+                            '<p class="d-flex justify-content-between align-items-center">Year: ' + book.year + '<a class="btn btn-primary read-more" href="http://localhost:9091/books/show.html?id=' + book.id + '">Read more...</a></p>' +
                             '</div>';
                         $('#book-list').append(bookHtml);
                     });
@@ -183,7 +207,7 @@
         $('.change-direction').click(function () {
             sortDirection = sortDirection === 'ASC' ? 'DESC' : 'ASC';
 
-            var image = document.getElementById('directionImage')
+            const image = document.getElementById('directionImage');
             if (sortDirection === 'ASC') {
                 image.src = '../img/sort_asc.png';
             } else {
@@ -200,7 +224,7 @@
 
 
         function updatePagination(numbers) {
-            var pagination = $('#pagination');
+            const pagination = $('#pagination');
             pagination.empty();
 
             totalPageCount = numbers.length;
@@ -209,16 +233,16 @@
                 return;
             }
 
-            var prevPage = currentPage > 0 ? currentPage - 1 : 0;
-            var nextPage = currentPage < totalPageCount - 1 ? currentPage + 1 : totalPageCount - 1;
+            const prevPage = currentPage > 0 ? currentPage - 1 : 0;
+            const nextPage = currentPage < totalPageCount - 1 ? currentPage + 1 : totalPageCount - 1;
 
-            var prevLink = '<li class="page-item' + (currentPage === 0 ? ' disabled' : '') + '"><a class="page-link" href="#">&laquo;</a></li>';
-            var nextLink = '<li class="page-item' + (currentPage === totalPageCount - 1 ? ' disabled' : '') + '"><a class="page-link" href="#">&raquo;</a></li>';
+            const prevLink = '<li class="page-item' + (currentPage === 0 ? ' disabled' : '') + '"><a class="page-link" href="#">&laquo;</a></li>';
+            const nextLink = '<li class="page-item' + (currentPage === totalPageCount - 1 ? ' disabled' : '') + '"><a class="page-link" href="#">&raquo;</a></li>';
 
             pagination.append(prevLink);
-            for (var i = 0; i < totalPageCount; i++) {
-                var pageNumber = i;
-                var pageLink = '<li class="page-item' + (i === currentPage ? ' active' : '') + '"><a class="page-link' + (i === currentPage ? ' disabled' : '') + '" href="#">' + (pageNumber + 1) + '</a></li>';
+            for (let i = 0; i < totalPageCount; i++) {
+                const pageNumber = i;
+                const pageLink = '<li class="page-item' + (i === currentPage ? ' active' : '') + '"><a class="page-link' + (i === currentPage ? ' disabled' : '') + '" href="#">' + (pageNumber + 1) + '</a></li>';
                 pagination.append(pageLink);
 
                 (function (page) {

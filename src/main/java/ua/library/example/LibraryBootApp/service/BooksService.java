@@ -1,16 +1,15 @@
 package ua.library.example.LibraryBootApp.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ua.library.example.LibraryBootApp.dto.books.RequestBookDto;
 import ua.library.example.LibraryBootApp.models.Book;
 import ua.library.example.LibraryBootApp.models.Person;
 import ua.library.example.LibraryBootApp.repositories.BooksRepositories;
-import ua.library.example.LibraryBootApp.repositories.PeopleRepositories;
-
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,10 +19,12 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class BooksService {
     private final BooksRepositories booksRepositories;
+    private final PeopleService peopleService;
 
     @Autowired
-    public BooksService(BooksRepositories booksRepositories) {
+    public BooksService(BooksRepositories booksRepositories, PeopleService peopleService) {
         this.booksRepositories = booksRepositories;
+        this.peopleService = peopleService;
     }
 
     public Page<Book> index(Pageable pageable) {
@@ -32,11 +33,17 @@ public class BooksService {
 
     public Book show(int id) {
         Optional<Book> foundBook = booksRepositories.findById(id);
-        return foundBook.orElse(null);
+
+        if (foundBook.isEmpty()) {
+            throw new EntityNotFoundException("Book not found");
+        }
+
+        return foundBook.get();
     }
 
     @Transactional
-    public void add(Book book) {
+    public void add(RequestBookDto dto) {
+        Book book = new Book(dto.getName(), dto.getAuthor(), dto.getYear());
         booksRepositories.save(book);
     }
 
@@ -53,26 +60,36 @@ public class BooksService {
 
     @Transactional
     public void returnBook(int id) {
-        Book book = booksRepositories.findById(id).orElse(null);
+        Book book = show(id);
         book.setPerson(null);
         book.setOrderTime(null);
         booksRepositories.save(book);
     }
 
     @Transactional
-    public void getBook(int bookId, Person person){
-        Book book = booksRepositories.findById(bookId).orElse(null);
-        book.setPerson(person);
+    public void getBook(int bookId, int personId){
+        Book book = show(bookId);
+        book.setPerson(peopleService.show(personId));
         book.setOrderTime(LocalDateTime.now());
         booksRepositories.save(book);
     }
 
     public Person showOwner(int bookId) {
-        return booksRepositories.findById(bookId).get().getPerson();
+        return show(bookId).getPerson();
     }
 
-    public Optional<Book> searchByTitle(String title) {
-        Optional<Book> searchedBook = Optional.ofNullable(booksRepositories.findBookByNameStartingWith(title));
-        return searchedBook;
+    private void checkOverdue(Book book) {
+        int bookLoanPeriod = 2;
+        LocalDateTime orderTime = book.getTime();
+        LocalDateTime twoWeeksAgo = LocalDateTime.now().minusWeeks(bookLoanPeriod);
+
+        if (orderTime.isBefore(twoWeeksAgo)) {
+            book.setOverdue(true); //TODO Добавити функцію записання не повернтутих книжок
+        }
+    }
+
+    public List<Book> searchByTitle(String title) {
+        title = title.substring(0, 1).toUpperCase() + title.substring(1);
+        return booksRepositories.findBookByNameStartingWith(title);
     }
 }

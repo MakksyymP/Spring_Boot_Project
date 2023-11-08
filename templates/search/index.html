@@ -1,169 +1,296 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Search</title>
-    <style>
+    <meta charset="UTF-8">
+    <title>Search</title>
 
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #F2F2F2;
-        }
-
-        .container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .back {
-            padding: 50px;
-            border: 2px solid #B0C4DE;
-            border-radius: 8px;
-            background-color: white;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), 0 6px 6px rgba(0, 0, 0, 0.1);
-            max-width: 800px;
-            width: 100%;
-        }
-
-        h2 {
-            margin-top: 0;
-        }
-
-        .book_info p {
-            margin: 0;
-            font-size: 18px;
-            line-height: 1.4;
-        }
-
-        .btn {
-            display: inline-block;
-            background-color: #C0C0C0;
-            text-decoration: none;
-            color: black;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-            margin-right: 10px;
-        }
-
-        .btn:hover {
-            background-color: #A9A9A9;
-        }
-
-        .btn:last-child {
-            margin-right: 0;
-        }
-
-        .search {
-            display: inline-block;
-            margin-bottom: 20px;
-        }
-
-        .btn.search {
-            display: inline-block;
-            background-color: #C0C0C0;
-            text-decoration: none;
-            color: black;
-            padding: 8px 12px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-            margin-right: 10px;
-        }
-
-        .btn.search:hover {
-            background-color: #A9A9A9;;
-        }
-
-        label.search {
-            font-size: 18px;
-        }
-
-        #bookName {
-            margin-left: 10px;
-            display: inline-block;
-            padding: 8px;
-            border-radius: 8px;
-            border: 2px solid #afc3dd;
-            width: 50%;
-            margin-right: 10px;
-        }
-
-        #searchResult {
-            margin-top: 20px;
-        }
-
-        #searchResult p {
-            font-size: 18px;
-            margin-bottom: 5px;
-        }
-
-        .book_list {
-            margin: 0;
-            padding: 0;
-            list-style-type: none;
-        }
-
-        .book_item {
-            margin: 5px 0;
-            padding: 5px;
-            border: 1px solid #B0C4DE;
-            border-radius: 5px;
-            /*background-color: #F2F2F2;*/
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .book_title {
-            margin-bottom: 10px;
-            font-weight: bold;
-            font-size: 20px;
-        }
-
-        #resultBox {
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        #resultBox.visible {
-            display: inline;
-            opacity: 1;
-        }
-
-        .non-visible {
-            display: none;
-        }
-
-        .visible {
-            display: inline;
-        }
-
-    </style>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://bootswatch.com/4/darkly/bootstrap.min.css" rel="stylesheet">
 </head>
+<style>
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .back {
+        padding: 20px;
+        border: 1px solid #212529;
+        border-radius: 5px;
+        background-color: #343a40;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), 0 6px 6px rgba(0, 0, 0, 0.1);
+        max-width: 800px;
+        width: 100%;
+    }
+
+    .dropdown-item {
+        user-select: none;
+    }
+
+    .form-control {
+        background-color: #222;
+        color: #ccc;
+        border: 1px solid #345870;
+        margin-right: 10px;
+    }
+
+    .form-control:focus {
+        color: #ccc;
+        border: 1px solid #28415b;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        background-color: #333;
+    }
+
+    .form-container {
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+</style>
 <body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-darkly">
+    <a class="navbar-brand" href="http://localhost:9091/">Search</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle show" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="true">Books</a>
+                <div class="dropdown-menu" data-popper="static">
+                    <a class="dropdown-item" href="http://localhost:9091/books/">Book list</a>
+                    <a class="dropdown-item" href="http://localhost:9091/books/create.html">Add new book</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle show" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">People</a>
+                <div class="dropdown-menu" data-popper="static">
+                    <a class="dropdown-item" href="http://localhost:9091/people/">People list</a>
+                    <a class="dropdown-item" href="http://localhost:9091/people/create.html">Add new person</a>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="http://localhost:9091/search/">Search</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
 <div class="container">
     <div class="back center">
-        <h2>Search for a Book</h2>
-        <form th:action="@{search/show}" th:method="get">
-            <label class="search" for="bookName">Enter the searched query: </label>
-            <input class="search" type="text" name="title" id="bookName">
-            <button type="submit" class="btn search">Search</button>
-        </form>
 
-        <br/>
-        <hr/>
+        <div id="message-container" class="alert" style="display: none;"></div>
 
-        <a href="../main" class="btn">Back</a>
+        <div>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+                    <button type="button" class="btn btn-primary" style="pointer-events: none">
+                        <img id="searchImage" src="../img/hz.png" width="25" height="25" alt="Hz">
+                    </button>
+                    <div class="btn-group" role="group">
+                        <a id="itemsPerPageDropdown" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            What you search
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="itemsPerPageDropdown">
+                            <a class="change-type dropdown-item" href="#" data-type="book">Book</a>
+                            <a class="change-type dropdown-item" href="#" data-type="person">Person</a>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="onBack()" style="width: 74px">Back</button>
+            </div>
+
+            <input style="display: none" type="text" id="search-type-input">
+
+            <div class="form-container">
+                <input type="text" id="searchInput" class="form-control" placeholder="Enter book title">
+                <button id="searchButton" class="btn btn-primary" style="width: 80px">Search</button>
+            </div>
+        </div>
+
+        <div id="bookInfoContainer" style="display: none;">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Issue Year</th>
+                        <th>Is Busy</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody id="bookInfoTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <div id="personInfoContainer" style="display: none;">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Birth Year</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody id="personInfoTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
     </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $("input[type='text']").val("");
+
+        $('.change-type').click(function () {
+            const type = $(this).data("type");
+            $('#search-type-input').val(type);
+
+            $("#bookInfoContainer").hide();
+            $("#personInfoContainer").hide();
+            $("#searchInput").val('');
+
+            let imageSrc;
+            if (type === 'book') {
+                imageSrc = "../img/books.png";
+            } else if (type === 'person') {
+                imageSrc = "../img/person.png";
+            } else {
+                imageSrc = "../img/hz.png";
+            }
+
+            $('#searchImage').attr('src', imageSrc);
+        });
+
+        $("#searchButton").click(function() {
+            const searchType = $('#search-type-input').val();
+
+            if (searchType === 'book') {
+                const bookTitle = $("#searchInput").val();
+                getBook(bookTitle);
+            } else if (searchType === 'person') {
+                const personName = $("#searchInput").val();
+                getPerson(personName);
+            } else {
+                displayMessage(`Choose search type`, 'alert-danger')
+            }
+
+        });
+    });
+
+    function getBook(title) {
+        const data = {
+            title: title
+        };
+
+        $.ajax({
+            url: "http://localhost:8080/books/title",
+            type: "POST",
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function(data) {
+                if (data) {
+                    const bookInfoTableBody = $("#bookInfoTableBody");
+                    bookInfoTableBody.empty();
+
+                    data.forEach(function(book) {
+                        const row = `
+                        <tr>
+                            <td>${book.id}</td>
+                            <td>${book.name}</td>
+                            <td>${book.author}</td>
+                            <td>${book.year}</td>
+                            <td style="color: ${book.isBusy ? 'red' : 'green'}">${book.isBusy ? 'Yes' : 'No'}</td>
+                            <td><a class="btn btn-primary read-more" href="http://localhost:9091/books/show.html?id=${book.id}">Info...</a></td>
+                        </tr>
+                    `;
+                        bookInfoTableBody.append(row);
+                    });
+
+                    $("#bookInfoContainer").show();
+                    $('#message-container').hide();
+                } else {
+                    displayMessage(`Book not found`, 'alert-danger');
+                }
+            },
+            error: function() {
+                displayMessage(`Book not found`, 'alert-danger');
+            }
+        });
+    }
+
+    function getPerson(name) {
+        const data = {
+            name: name
+        };
+
+        $.ajax({
+            url: `http://localhost:8080/people/name`,
+            type: "POST",
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function(data) {
+                if (data.length > 0) {
+                    const personInfoTableBody = $("#personInfoTableBody");
+                    personInfoTableBody.empty();
+
+                    data.forEach(function(person) {
+                        const row = `
+                        <tr>
+                            <td>${person.id}</td>
+                            <td>${person.name}</td>
+                            <td>${person.year}</td>
+                            <td><a class="btn btn-primary read-more" href="http://localhost:9091/people/show.html?id=${person.id}">Info...</a></td>
+                        </tr>
+                    `;
+                        personInfoTableBody.append(row);
+                    });
+
+                    $("#personInfoContainer").show();
+                    $('#message-container').hide();
+                } else {
+                    displayMessage(`Person not found`, 'alert-danger');
+                }
+            },
+            error: function() {
+                displayMessage(`Person not found`, 'alert-danger');
+            }
+        });
+    }
+
+    function displayMessage(message, alertClass) {
+        const messageContainer = $('#message-container');
+        messageContainer.text(message);
+        messageContainer.removeClass('alert-success alert-danger').addClass(alertClass);
+        messageContainer.show();
+    }
+
+    function onBack() {
+        window.history.back();
+    }
+
+</script>
+
 </body>
 </html>

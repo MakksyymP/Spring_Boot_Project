@@ -3,10 +3,6 @@ package ua.library.example.LibraryBootApp.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
@@ -20,13 +16,9 @@ public class Person {
     private int id;
 
     @Column(name = "fullname")
-    @NotEmpty(message = "FullName should not be empty")
-    @Size(min = 2, max = 50, message = "FullName should be between 8 and 50 characters")
-    @Pattern(regexp = "[A-Z]\\w+ [A-Z]\\w+ [A-Z]\\w+", message = "Your FullName should be in this format: Name Surname Patronymic")
     private String name;
 
     @Column(name = "birthyear")
-    @Min(value = 0, message = "Year of Birth should be greater than 0")
     private int year;
 
     @OneToMany(mappedBy = "owner")
