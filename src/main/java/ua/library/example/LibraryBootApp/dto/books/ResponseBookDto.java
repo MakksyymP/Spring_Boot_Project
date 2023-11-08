@@ -23,4 +23,12 @@ public class ResponseBookDto {
     public void setBooks(List<Book> books) {
         this.books = books;
     }
+
+    public int[] getNumbers() {
+        return numbers;
+    }
+
+    public String getSort() {
+        return sort;
+    }
 }

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Edit Book</title>
+    <title>New Person</title>
 
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://bootswatch.com/4/darkly/bootstrap.min.css" rel="stylesheet">
@@ -50,11 +50,12 @@
         background-color: #333;
     }
 
+
 </style>
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-darkly">
-    <a class="navbar-brand" href="http://localhost:9091/">Edit book</a>
+    <a class="navbar-brand" href="http://localhost:9091/">Add person</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -81,30 +82,34 @@
     </div>
 </nav>
 
+
 <div class="container">
     <div class="back center">
-        <h2 class="mb-4">Edit Book</h2>
+        <h2 class="mb-4">Add New Person</h2>
         <div id="message-container" class="alert" style="display: none;"></div>
         <form>
             <div class="form-group">
-                <label for="name">Title:</label>
+                <label for="name">Name:</label>
                 <input type="text" class="form-control" id="name" name="name">
             </div>
             <div class="form-group">
-                <label for="author">Author:</label>
-                <input type="text" class="form-control" id="author" name="author">
+                <label for="surname">Surname:</label>
+                <input type="text" class="form-control" id="surname" name="surname">
             </div>
             <div class="form-group">
-                <label for="issueYear">Issue year:</label>
-                <select class="form-control" id="issueYear" name="issueYear">
+                <label for="patronymic">Patronymic:</label>
+                <input type="text" class="form-control" id="patronymic" name="patronymic">
+            </div>
+            <div class="form-group">
+                <label for="birthYear">Birth Year:</label>
+                <select class="form-control" id="birthYear" name="birthYear">
                 </select>
             </div>
-            <button type="submit" class="btn btn-dark">Edit</button>
+            <button type="submit" class="btn btn-dark">Add Person</button>
             <a onclick="onBack()" class="btn btn-dark">Back</a>
         </form>
     </div>
 </div>
-
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -112,41 +117,28 @@
 
 <script>
     $(document).ready(function () {
-        const urlParams = new URLSearchParams(window.location.search);
-        const bookId = urlParams.get("id");
-
-        $.ajax({
-            url: 'http://localhost:8080/books/' + bookId,
-            type: 'GET',
-            success: function(data) {
-                loadPage(data);
-            },
-            error: function(xhr, status) {
-                console.error('Error ' + status);
-            }
-        });
-
+        getYearSelect();
         $('form').submit(function (e) {
             e.preventDefault();
 
             const name = $('#name').val() || null;
-            const author = $('#author').val() || null;
-            const issueYear = $('#issueYear').val() || null;
+            const surname = $('#surname').val() || null;
+            const patronymic = $('#patronymic').val() || null;
+            const birthYear = $('#birthYear').val() || null;
 
             const data = {
-                name: name,
-                author: author,
-                year: issueYear
+                name: name + ' ' + surname + ' ' + patronymic,
+                year: birthYear
             };
 
             $.ajax({
-                url: 'http://localhost:8080/books/' + bookId,
-                type: 'PATCH',
+                url: 'http://localhost:8080/people',
+                type: 'POST',
                 data: JSON.stringify(data),
                 contentType: 'application/json',
                 success: function () {
                     displayMessage('Success', 'alert-success');
-                    location.href = 'http://localhost:9091/books/show.html?id=' + bookId;
+                    $('form')[0].reset();
                 },
                 error: function (xhr) {
                     const errorMessage = JSON.parse(xhr.responseText).message;
@@ -155,26 +147,6 @@
             });
         });
     });
-
-    function loadPage(data) {
-        $('#name').val(data.name);
-        $('#author').val(data.author);
-        getYearSelect(data.year)
-    }
-
-    function getYearSelect(issYear) {
-        const currentYear = new Date().getFullYear();
-        const minYear = 1700;
-        const select = $('#issueYear');
-
-        for (let year = currentYear; year >= minYear; year--) {
-            const option = $('<option>').val(year).text(year);
-            if (year === issYear) {
-                option.prop('selected', true);
-            }
-            select.append(option);
-        }
-    }
 
     function displayMessage(message, alertClass) {
         const messageContainer = $('#message-container');
@@ -186,6 +158,23 @@
     function onBack() {
         window.history.back();
     }
+
+    function getYearSelect() {
+        const currentYear = new Date().getFullYear();
+        const minYear = 1900;
+        const select = $('#birthYear');
+
+        for (let year = currentYear; year >= minYear; year--) {
+            const option = $('<option>').val(year).text(year);
+            select.append(option);
+        }
+    }
+
+    window.onload = function () {
+        $('form')[0].reset();
+    }
+
+
 </script>
 
 </body>

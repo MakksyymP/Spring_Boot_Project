@@ -2,17 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Update Book</title>
+    <title>Edit Person</title>
+
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://bootswatch.com/4/darkly/bootstrap.min.css" rel="stylesheet">
 </head>
 <style>
-
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #F2F2F2;
-    }
-
     .container {
         display: flex;
         justify-content: center;
@@ -21,78 +16,193 @@
     }
 
     .back {
-        padding: 50px;
-        border: 2px solid #B0C4DE;
-        border-radius: 8px;
-        background-color: white;
+        padding: 20px;
+        border: 1px solid #212529;
+        border-radius: 5px;
+        background-color: #343a40;
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), 0 6px 6px rgba(0, 0, 0, 0.1);
         max-width: 800px;
-        width: 30%;
+        width: 100%;
     }
 
-    input[type=text] {
-        border: none;
-        border-bottom: 2px solid #B0C4DE;
-        outline: none;
-        margin-bottom: 20px;
-        padding: 10px;
-        font-size: 16px;
+    .form-container .btn-group {
+        width: 47%;
     }
 
-    label {
-        display: block;
-        font-size: 18px;
-        margin-bottom: 10px;
-        font-weight: bold;
+    .form-container .form-control {
+        width: 47%;
     }
 
-    .book_info p {
-        margin: 0;
-        font-size: 18px;
-        line-height: 1.4;
+    .dropdown-item {
+        user-select: none;
     }
 
-    .btn {
-        display: inline-block;
-        background-color: #C0C0C0;
-        text-decoration: none;
-        color: black;
-        padding: 12px 24px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 16px;
-        transition: background-color 0.3s ease;
-        margin-right: 10px;
+    .form-control {
+        background-color: #222;
+        color: #ccc;
+        border: 1px solid #345870;
     }
 
-    .btn:hover {
-        background-color: #A9A9A9;
-    }
-
-    .btn:last-child {
-        margin-right: 0;
+    .form-control:focus {
+        color: #ccc;
+        border: 1px solid #28415b;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        background-color: #333;
     }
 
 </style>
 <body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-darkly">
+    <a class="navbar-brand" href="http://localhost:9091/">Edit person</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle show" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="true">Books</a>
+                <div class="dropdown-menu" data-popper="static">
+                    <a class="dropdown-item" href="http://localhost:9091/books/">Book list</a>
+                    <a class="dropdown-item" href="http://localhost:9091/books/create.html">Add new book</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle show" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">People</a>
+                <div class="dropdown-menu" data-popper="static">
+                    <a class="dropdown-item" href="http://localhost:9091/people/">People list</a>
+                    <a class="dropdown-item" href="http://localhost:9091/people/create.html">Add new person</a>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="http://localhost:9091/search/">Search</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+
 <div class="container">
     <div class="back center">
-        <form th:action="@{update(id=${person.getId()})}" th:method="post" th:object="${person}">
-            <label for="fullName">Enter the Full Name: </label>
-            <input type="text" th:field="*{name}" id="fullName" />
-            <div style="color: red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}" />
-            <br/><br/>
-            <label for="birthYear">Enter the Year of birth: </label>
-            <input type="text" th:field="*{year}" id="birthYear" />
-            <div style="color: red" th:if="${#fields.hasErrors('year')}" th:errors="*{year}" />
-
-            <br/>
-            <hr/>
-
-            <input type="submit" value="Update" class="btn"/>
+        <h2 class="mb-4">Edit Person</h2>
+        <div id="message-container" class="alert" style="display: none;"></div>
+        <form>
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" class="form-control" id="name" name="name">
+            </div>
+            <div class="form-group">
+                <label for="surname">Surname:</label>
+                <input type="text" class="form-control" id="surname" name="surname">
+            </div>
+            <div class="form-group">
+                <label for="patronymic">Patronymic:</label>
+                <input type="text" class="form-control" id="patronymic" name="patronymic">
+            </div>
+            <div class="form-group">
+                <label for="birthYear">Birth Year:</label>
+                <select class="form-control" id="birthYear" name="birthYear">
+                </select>
+            </div>
+            <button type="submit" class="btn btn-dark">Edit Person</button>
+            <a onclick="onBack()" class="btn btn-dark">Back</a>
         </form>
     </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const personId = urlParams.get("id");
+
+        $.ajax({
+            url: 'http://localhost:8080/people/' + personId,
+            type: 'GET',
+            success: function(data) {
+                loadPage(data);
+            },
+            error: function(xhr, status) {
+                console.error('Error ' + status);
+            }
+        });
+
+
+        $('form').submit(function (e) {
+            e.preventDefault();
+
+            const name = $('#name').val() || null;
+            const surname = $('#surname').val() || null;
+            const patronymic = $('#patronymic').val() || null;
+            const birthYear = $('#birthYear').val() || null;
+
+            const data = {
+                name: name + ' ' + surname + ' ' + patronymic,
+                year: birthYear
+            };
+
+            $.ajax({
+                url: 'http://localhost:8080/people/' + personId,
+                type: 'PATCH',
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                success: function () {
+                    displayMessage('Success', 'alert-success');
+                    location.href = 'http://localhost:9091/people/show.html?id=' + personId;
+                },
+                error: function (xhr) {
+                    const errorMessage = JSON.parse(xhr.responseText).message;
+                    displayMessage(`Error: ${errorMessage}`, 'alert-danger');
+                }
+            });
+        });
+    });
+
+    function loadPage(data) {
+        data = data.person;
+        const fullName = data.name.split(" ");
+
+        const name = fullName[0];
+        const surname = fullName[1];
+        const patronymic = fullName[2];
+
+        $('#name').val(name);
+        $('#surname').val(surname);
+        $('#patronymic').val(patronymic);
+
+        getYearSelect(data.year)
+    }
+
+    function getYearSelect(birthYear) {
+        const currentYear = new Date().getFullYear();
+        const minYear = 1900;
+        const select = $('#birthYear');
+
+        for (let year = currentYear; year >= minYear; year--) {
+            const option = $('<option>').val(year).text(year);
+            if (year === birthYear) {
+                option.prop('selected', true);
+            }
+            select.append(option);
+        }
+    }
+
+    function displayMessage(message, alertClass) {
+        const messageContainer = $('#message-container');
+        messageContainer.text(message);
+        messageContainer.removeClass('alert-success alert-danger').addClass(alertClass);
+        messageContainer.show();
+    }
+
+    function onBack() {
+        window.history.back();
+    }
+
+
+</script>
+
 </body>
 </html>

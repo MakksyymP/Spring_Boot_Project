@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Edit Book</title>
+    <title>New Book</title>
 
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://bootswatch.com/4/darkly/bootstrap.min.css" rel="stylesheet">
@@ -54,7 +54,7 @@
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-darkly">
-    <a class="navbar-brand" href="http://localhost:9091/">Edit book</a>
+    <a class="navbar-brand" href="http://localhost:9091/">Add book</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -83,7 +83,7 @@
 
 <div class="container">
     <div class="back center">
-        <h2 class="mb-4">Edit Book</h2>
+        <h2 class="mb-4">Add New Book</h2>
         <div id="message-container" class="alert" style="display: none;"></div>
         <form>
             <div class="form-group">
@@ -99,7 +99,7 @@
                 <select class="form-control" id="issueYear" name="issueYear">
                 </select>
             </div>
-            <button type="submit" class="btn btn-dark">Edit</button>
+            <button type="submit" class="btn btn-dark">Add Book</button>
             <a onclick="onBack()" class="btn btn-dark">Back</a>
         </form>
     </div>
@@ -112,20 +112,7 @@
 
 <script>
     $(document).ready(function () {
-        const urlParams = new URLSearchParams(window.location.search);
-        const bookId = urlParams.get("id");
-
-        $.ajax({
-            url: 'http://localhost:8080/books/' + bookId,
-            type: 'GET',
-            success: function(data) {
-                loadPage(data);
-            },
-            error: function(xhr, status) {
-                console.error('Error ' + status);
-            }
-        });
-
+        getYearSelect();
         $('form').submit(function (e) {
             e.preventDefault();
 
@@ -140,13 +127,13 @@
             };
 
             $.ajax({
-                url: 'http://localhost:8080/books/' + bookId,
-                type: 'PATCH',
+                url: 'http://localhost:8080/books',
+                type: 'POST',
                 data: JSON.stringify(data),
                 contentType: 'application/json',
                 success: function () {
                     displayMessage('Success', 'alert-success');
-                    location.href = 'http://localhost:9091/books/show.html?id=' + bookId;
+                    $('form')[0].reset();
                 },
                 error: function (xhr) {
                     const errorMessage = JSON.parse(xhr.responseText).message;
@@ -156,22 +143,13 @@
         });
     });
 
-    function loadPage(data) {
-        $('#name').val(data.name);
-        $('#author').val(data.author);
-        getYearSelect(data.year)
-    }
-
-    function getYearSelect(issYear) {
+    function getYearSelect() {
         const currentYear = new Date().getFullYear();
         const minYear = 1700;
         const select = $('#issueYear');
 
         for (let year = currentYear; year >= minYear; year--) {
             const option = $('<option>').val(year).text(year);
-            if (year === issYear) {
-                option.prop('selected', true);
-            }
             select.append(option);
         }
     }
@@ -186,6 +164,11 @@
     function onBack() {
         window.history.back();
     }
+
+    window.onload = function () {
+        $('form')[0].reset();
+    }
+
 </script>
 
 </body>

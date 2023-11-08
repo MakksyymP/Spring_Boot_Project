@@ -1,10 +1,6 @@
 package ua.library.example.LibraryBootApp.models;
 
-
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 
@@ -18,17 +14,12 @@ public class Book {
     private int id;
 
     @Column(name = "name")
-    @NotEmpty(message = "Name should not be empty")
-    @Size(min = 2, max = 50, message = "Name should be between 8 and 50 characters")
     private String name;
 
     @Column(name = "author")
-    @NotEmpty(message = "Author should not be empty")
-    @Size(min = 2, max = 50, message = "Author should be between 8 and 50 characters")
     private String author;
 
     @Column(name = "issueyear")
-    @Min(value = 0, message = "Year of Birth should be greater than 0")
     private int year;
 
     @Column(name = "order_time")
