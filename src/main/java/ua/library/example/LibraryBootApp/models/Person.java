@@ -4,10 +4,11 @@ package ua.library.example.LibraryBootApp.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "Persons")
+@Table(name = "people")
 public class Person {
 
     @Id
@@ -24,6 +25,10 @@ public class Person {
     @OneToMany(mappedBy = "owner")
     @JsonIgnore
     private List<Book> books;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id")
+    private SuccessfulReturns returns;
 
     public Person() {
     }
@@ -57,11 +62,26 @@ public class Person {
         this.year = year;
     }
 
+    public void setBooks(List<Book> books) {
+        this.books = books;
+    }
+
+    public SuccessfulReturns getReturns() {
+        return returns;
+    }
+
     public List<Book> getBooks() {
+        books.forEach(this::checkOverdue);
         return books;
     }
 
-    public void setBooks(List<Book> books) {
-        this.books = books;
+    private void checkOverdue(Book book) {
+        int bookLoanPeriod = book.getLoanDurationWeeks();
+        LocalDateTime orderTime = book.getTime();
+        LocalDateTime coupleWeeksAgo = LocalDateTime.now().minusWeeks(bookLoanPeriod);
+
+        if (orderTime.isBefore(coupleWeeksAgo)) {
+            book.setOverdue(true);
+        }
     }
 }

@@ -5,7 +5,13 @@
     <title>Book Info</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://bootswatch.com/4/darkly/bootstrap.min.css" rel="stylesheet">
+    <link rel="shortcut icon" href="../img/books.png">
+
     <style>
+        body {
+            color: #ccc;
+        }
+
         .container {
             display: flex;
             justify-content: center;
@@ -59,7 +65,6 @@
         .form-container {
             display: flex;
             justify-content: space-between;
-            margin-top: 3%;
             margin-right: 3%;
             margin-left: 3%;
         }
@@ -121,7 +126,7 @@
             <div class="form-group" id="owner-missing">
                 <div class="person-info" style="margin-top: 3%"><h5>Now this book is available. Who will get it?</h5></div>
                 <div class="form-group">
-                    <div class="form-container">
+                    <div class="form-container" style="margin-top: 3%;">
                         <div class="btn-group" role="group">
                             <a id="itemsPerPageDropdown" type="button" class="btn btn-primary dropdown-toggle mt-0 mb-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Choose person
@@ -130,6 +135,20 @@
                             </div>
                         </div>
                         <input placeholder="Choose person.." disabled="" type="text" class="form-control mt-0 mb-0" id="person_input" name="person_input" >
+                    </div>
+                    <div class="form-container" style="margin-top: 10px">
+                        <div class="btn-group" role="group">
+                            <a id="loanPeriod" type="button" class="btn btn-primary dropdown-toggle mt-0 mb-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Choose loan period
+                            </a>
+                            <div class="dropdown-menu" id="loan_period-select-drop">
+                                <a class="choose-period dropdown-item" data-period="1">1 week</a>
+                                <a class="choose-period dropdown-item" data-period="2">2 weeks</a>
+                                <a class="choose-period dropdown-item" data-period="3">3 weeks</a>
+                                <a class="choose-period dropdown-item" data-period="4">4 weeks</a>
+                            </div>
+                        </div>
+                        <input placeholder="Choose period.." disabled="" type="text" class="form-control mt-0 mb-0" id="loan_period_input" name="loan_period_input" >
                     </div>
                     <button style="width: 94%; margin-left: 3%" class="btn btn-primary book-info-btn" id="get-book-btn" type="button" onclick="getBook()">Get the book</button>
                 </div>
@@ -141,6 +160,24 @@
             <a href="#" onclick="editButton()" class="btn btn-primary">Edit</a>
             <a href="#" onclick="deleteBook()" class="btn btn-primary">Delete</a>
             <a href="#" onclick="onBack()" class="btn btn-primary">Back</a>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="customAlertModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Notifications</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="customAlertText">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+            </div>
         </div>
     </div>
 </div>
@@ -213,13 +250,19 @@
         $('#person_input').val(selectedValue);
     });
 
+    $('#loan_period-select-drop').on('click', '.choose-period', function(event) {
+        event.preventDefault();
+        const selectedValue = $(this).data('period');
+        $('#loan_period_input').val(selectedValue);
+    });
+
     function deleteBook() {
         if (confirm(`Are you sure you want to remove a book from the ID ${bookId}?`)) {
             $.ajax({
                 type: 'DELETE',
                 url: `http://localhost:8080/books/${bookId}`,
                 success: function () {
-                    alert(`The book with ID ${bookId} has been successfully deleted.`);
+                    displayMessageInModal(`The book with ID ${bookId} has been successfully deleted.`);
                     location.href = 'http://localhost:9091/books/';
                 },
                 error: function (xhr, status, error) {
@@ -235,7 +278,7 @@
                 type: 'PATCH',
                 url: `http://localhost:8080/books/${bookId}/return`,
                 success: function () {
-                    alert(`The book with ID ${bookId} has been successfully returned.`);
+                    displayMessageInModal(`The book with ID ${bookId} has been successfully returned.`);
                     location.reload();
                 },
                 error: function (xhr, status, error) {
@@ -247,28 +290,39 @@
 
     function getBook() {
         const personId =  $('#person_input').val();
-        console.log(personId);
+        const loanPeriod =  $('#loan_period_input').val();
 
         if(!personId){
-            alert(`Please select a person first`);
+            displayMessageInModal(`Please select a person first`);
+            return;
+        }
+
+        if(!loanPeriod){
+            displayMessageInModal(`Please select a loan period first`);
             return;
         }
 
         if (confirm(`Are you sure you want to get a book  ${bookId}?`)) {
             $.ajax({
                 type: 'PATCH',
-                url: `http://localhost:8080/books/${bookId}/get?personId=` + personId,
+                url: `http://localhost:8080/books/${bookId}/get?personId=` + personId + '&loanPeriod=' + loanPeriod,
                 success: function () {
-                    alert(`The book with ID ${bookId} has been got.`);
+                    displayMessageInModal(`The book with ID ${bookId} has been got.`);
                     location.reload();
                 },
                 error: function (xhr, status, error) {
-                    console.error('Failed to get book:', error);
+                    const errorMessage = JSON.parse(xhr.responseText).message;
+                    displayMessageInModal(errorMessage);
                 }
             });
         }
     }
 
+    function displayMessageInModal(message) {
+        const customAlertText = $('#customAlertText');
+        customAlertText.text(message);
+        $('#customAlertModal').modal('show');
+    }
 
     function onBack() {
         window.history.back();
@@ -280,6 +334,7 @@
 
     function clearFormFields() {
         document.getElementById("person_input").value = "";
+        document.getElementById("loan_period_input").value = "";
     }
 
     window.addEventListener("load", clearFormFields);

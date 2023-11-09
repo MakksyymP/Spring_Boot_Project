@@ -1,86 +1,272 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>Update Book</title>
+    <title>Home</title>
+
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://bootswatch.com/4/darkly/bootstrap.min.css" rel="stylesheet">
+    <link rel="shortcut icon" href="img/library.ico">
+
+    <style>
+        body {
+            color: #ccc;
+            margin: 0;
+            padding: 0;
+        }
+
+        .book-info h3 {
+            font-size: 24px;
+            color: #fff;
+        }
+
+        .book-info p {
+            font-size: 18px;
+            color: #e9ecef;
+            margin: 10px 0;
+        }
+
+        .page-link {
+            user-select: none;
+        }
+
+        .dropdown-item {
+            user-select: none;
+        }
+
+        .navbar {
+            user-select: none;
+        }
+
+        .page-item.disabled .page-link {
+            background-color: #28415b;
+            pointer-events: none;
+            color: #888;
+        }
+
+        .page-item.active .page-link {
+            background-color: #28415b;
+            pointer-events: none;
+            color: #888;
+        }
+
+        header {
+            height: 300px;
+            background-image: url('img/bg.jpg');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+
+        .header-content h1 {
+            font-size: 36px;
+            margin: 0;
+        }
+
+        .overlay-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #fff;
+        }
+
+        .overlay-text h2 {
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .overlay-text p {
+            font-size: 14px;
+            margin: 0;
+        }
+
+        main {
+            text-align: center;
+        }
+
+        .card {
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .card-body {
+            text-align: center;
+        }
+
+
+        .back {
+            padding: 20px;
+            border: 1px solid #212529;
+            border-radius: 10px;
+            background-color: #444444;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), 0 6px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+
+        .back:hover {
+            background-color: #343a40;
+        }
+
+    </style>
 </head>
-<style>
 
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #F2F2F2;
-    }
-
-    .container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-    }
-
-    .back {
-        padding: 50px;
-        border: 2px solid #B0C4DE;
-        border-radius: 8px;
-        background-color: white;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), 0 6px 6px rgba(0, 0, 0, 0.1);
-        max-width: 800px;
-        width: 30%;
-    }
-
-    input[type=text] {
-        border: none;
-        border-bottom: 2px solid #B0C4DE;
-        outline: none;
-        margin-bottom: 20px;
-        padding: 10px;
-        font-size: 16px;
-    }
-
-    label {
-        display: block;
-        font-size: 18px;
-        margin-bottom: 10px;
-        font-weight: bold;
-    }
-
-    .book_info p {
-        margin: 0;
-        font-size: 18px;
-        line-height: 1.4;
-    }
-
-    .btn {
-        display: inline-block;
-        background-color: #C0C0C0;
-        text-decoration: none;
-        color: black;
-        padding: 12px 24px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 16px;
-        transition: background-color 0.3s ease;
-    }
-
-    .btn:hover {
-        background-color: #A9A9A9;
-    }
-
-    .btn:last-child {
-        margin-right: 0;
-    }
-
-</style>
 <body>
-<div class="container">
-    <div class="back center">
-        <a class="btn" href="/people">List of People</a>
-        <a class="btn" href="/books">Book Shelf</a>
-        <a class="btn" href="/search">Search</a>
+<nav class="navbar navbar-expand-lg navbar-dark bg-darkly">
+    <a class="navbar-brand" href="http://localhost:9091/">Home</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle show" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="true">Books</a>
+                <div class="dropdown-menu" data-popper="static">
+                    <a class="dropdown-item" href="http://localhost:9091/books/">Book list</a>
+                    <a class="dropdown-item" href="http://localhost:9091/books/create.html">Add new book</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle show" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">People</a>
+                <div class="dropdown-menu" data-popper="static">
+                    <a class="dropdown-item" href="http://localhost:9091/people/">People list</a>
+                    <a class="dropdown-item" href="http://localhost:9091/people/create.html">Add new person</a>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="http://localhost:9091/search/">Search</a>
+            </li>
+        </ul>
     </div>
-</div>
+</nav>
+
+<header>
+    <div class="overlay-text">
+        <h2>ENJOY BOOKS FOR FREE</h2>
+        <p>Here you will find a wide range of books to suit your taste, as well as a lot of scientific literature that can be borrowed free of charge from our library.</p>
+    </div>
+</header>
+
+<main>
+    <div class="container-fluid" style="padding: 0;">
+        <div class="accordion" id="accordionExample">
+            <div class="card" id="containerOne">
+                <div class="card-header" id="headingOne">
+                    <h5 class="mb-0">
+                        <div class="btn btn-link"  data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            About Our Library
+                        </div>
+                    </h5>
+                </div>
+                <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+                    <div class="card-body text-center">
+                        Welcome to our library, where books become accessible to all, regardless of financial means. Borrow books for free for a period ranging from 1 to 4 weeks.
+                        <p>The maximum number of books you can have at one time is 10. The maximum number of books you can keep at a time varies from 1 to 10 hours depending on the history of successful and unsuccessful returns.</p>
+                        <p>Our goal is to make reading accessible to everyone, so join us, borrow books, and immerse yourself in the world of words with our library.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" id="containerTwo">
+                <div class="card-header" id="headingTwo">
+                    <h5 class="mb-0">
+                        <div class="btn btn-link" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                            Rules and Incentives
+                        </div>
+                    </h5>
+                </div>
+
+                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+                    <div class="card-body text-center">
+                        Learn about our rules and incentives for good return practices. If you have 5 overdue returns, your loan duration decreases from 4 weeks to 3. With 10 overdue returns, it decreases to 2 weeks, and with 20 overdue returns, it decreases to 1 week.
+
+                        <p>If you have 5 overdue returns, the maximum number of simultaneous loans decreases to 4 books. With 10 overdue returns, it decreases to 3 books, and with 20 overdue returns, it decreases to 1 book.</p>
+
+                        <p>On the positive side, for every 5 successful returns, your maximum simultaneous loans increase. With 5 successful returns, it increases to 6 books; with 10, it increases to 8 books, and with 20, it increases to 10 books.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="main-second-part">
+        <div class="mx-auto my-4">
+            <div class="row">
+                <div class="col-md-6 col-sm-12 mb-4">
+                    <div class="container-box back" onclick="redirectToURL('http://localhost:9091/books/')">
+                        <img src="img/books.png" alt="Books">
+                        <h3>Books</h3>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-12 mb-4">
+                    <div class="container-box back" onclick="redirectToURL('http://localhost:9091/people/')">
+                        <img src="img/people.png" alt="Person">
+                        <h3>People</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</main>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    document.getElementById('containerOne').addEventListener('click', function () {
+        const collapseOne = document.getElementById('collapseOne');
+        const isCollapsed = collapseOne.classList.contains('show');
+
+        if (!isCollapsed) {
+            $('#collapseOne').collapse('show');
+        } else {
+            $('#collapseOne').collapse('hide');
+        }
+    });
+
+    document.getElementById('containerTwo').addEventListener('click', function () {
+        const collapseTwo = document.getElementById('collapseTwo');
+        const isCollapsed = collapseTwo.classList.contains('show');
+
+        if (!isCollapsed) {
+            $('#collapseTwo').collapse('show');
+        } else {
+            $('#collapseTwo').collapse('hide');
+        }
+    });
+
+
+    $('#accordionExample').on('show.bs.collapse', function () {
+        const $this = $(this);
+        $this.height($this.height() + $('#collapseOne').height());
+    }).on('hide.bs.collapse', function () {
+        $(this).height('');
+    });
+
+    function redirectToURL(url) {
+        window.location.href = url;
+    }
+
+</script>
 </body>
+
 </html>

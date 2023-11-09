@@ -6,8 +6,14 @@
 
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://bootswatch.com/4/darkly/bootstrap.min.css" rel="stylesheet">
+    <link rel="shortcut icon" href="../img/books.png">
 
     <style>
+
+        body {
+            color: #ccc;
+        }
+
         .read-more {
             background-color: #345870;
             color: #FFFFFF;
@@ -194,12 +200,14 @@
             updatePage(page, itemsPerPage, sortBy, sortDirection);
         }
 
-        $('.change-size').click(function () {
+        $('.change-size').click(function (event) {
+            event.preventDefault();
             itemsPerPage = $(this).data('size');
             loadPage(0);
         });
 
-        $('.change-sort').click(function () {
+        $('.change-sort').click(function (event) {
+            event.preventDefault();
             sortBy = $(this).data('sort');
             loadPage(0);
         });

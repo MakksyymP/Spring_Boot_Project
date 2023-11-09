@@ -55,7 +55,9 @@ public class PeopleController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> show(@PathVariable("id") int id) {
-        ResponsePersonByIdDto dto = new ResponsePersonByIdDto(peopleService.show(id), peopleService.showAllPersonalBooks(id));
+        Person person = peopleService.show(id);
+
+        ResponsePersonByIdDto dto = new ResponsePersonByIdDto(person, person.getBooks());
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
@@ -89,12 +91,6 @@ public class PeopleController {
     public ResponseEntity<?> delete(@PathVariable("id") int id) {
         peopleService.delete(id);
         return new ResponseEntity<>("Person was deleted", HttpStatus.OK);
-    }
-
-    private void checkValidation (BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            throw new ValidationException(BindingResultParser.parse(bindingResult));
-        }
     }
 
     private void checkValidation (BindingResult bindingResult, String name) {

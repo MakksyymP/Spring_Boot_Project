@@ -5,7 +5,14 @@
   <title>Person Info</title>
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://bootswatch.com/4/darkly/bootstrap.min.css" rel="stylesheet">
+  <link rel="shortcut icon" href="../img/people.png">
+
   <style>
+
+    body {
+      color: #ccc;
+    }
+
     .container {
       display: flex;
       justify-content: center;
@@ -25,13 +32,13 @@
 
     .person-info {
       font-size: 24px;
-      color: #fff;
+      color: #ccc;
       text-align: center;
     }
 
     .btn-primary {
       background-color: #345870;
-      color: #FFFFFF;
+      color: #ccc;
       border: none;
       border-radius: 5px;
       padding: 5px 10px;
@@ -45,13 +52,6 @@
       background-color: #28415b;
     }
 
-    .form-container {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 3%;
-      margin-right: 3%;
-      margin-left: 3%;
-    }
 
     .button-container {
       margin: 3%;
@@ -74,13 +74,13 @@
       padding: 10px;
       background-color: #343a40;
       border-radius: 5px;
-      border: 1px solid #dee2e6;
+      border: 1px solid #ccc;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       margin: 20px 0;
     }
 
     .book-info h4 {
-      color: #fff;
+      color: #ccc;
       text-align: center;
       margin-bottom: 10px;
     }
@@ -88,7 +88,7 @@
     .table {
       width: 100%;
       margin-bottom: 1rem;
-      color: #fff;
+      color: #ccc;
       background-color: #343a40;
 
     }
@@ -96,8 +96,25 @@
     .table th, .table td {
       padding: 0.75rem;
       vertical-align: top;
-      border-top: 1px solid #dee2e6;
-      color: white;
+      border-top: 1px solid #ccc;
+      color: #ccc;
+      text-align: center;
+    }
+
+    .returns_info {
+      text-align: center;
+      padding: 5px;
+      background-color: #343a40;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      margin-top: 5px;
+    }
+
+    @media (max-width: 767px) {
+      .back {
+        margin-top: 60px;
+      }
     }
 
 
@@ -135,6 +152,25 @@
   <div class="back center">
     <h2 class="person-info" id="person-info"></h2>
 
+    <div class="row">
+      <div class="col-md-6">
+        <div class="number-container" id="overdue-container">
+          <div class="returns_info">
+            <h6 style="color: red; text-align: center; margin-bottom: 10px;">Overdue Returns: <div id="overdue-number" class="number"></div></h6>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="number-container" id="successful-container">
+          <div class="returns_info">
+            <h6 style="color: green; text-align: center; margin-bottom: 10px;">Successful Returns: <div id="successful-number" class="number"></div></h6>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
     <div class="button-container">
       <a href="#" onclick="editButton()" class="btn btn-primary">Edit</a>
       <a href="#" onclick="deletePerson()" class="btn btn-primary">Delete</a>
@@ -149,7 +185,7 @@
       </div>
 
       <div id="books-present">
-        <h4 style="color: #fff; text-align: center; margin-bottom: 10px; margin-top: 5px">User's Books</h4>
+        <h4 style="color: #ccc; text-align: center; margin-bottom: 10px; margin-top: 5px">User's Books</h4>
         <div class="table-responsive">
           <table class="table table-striped">
             <thead>
@@ -169,6 +205,23 @@
   </div>
 </div>
 
+<div class="modal" id="customAlertModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Notifications</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="customAlertText">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -194,6 +247,7 @@
   function loadPage(data) {
     const person = data.person;
     const books = data.books;
+    const returns = data.person.returns;
 
     $('#person-info').text(person.name + ", " + person.year);
 
@@ -206,6 +260,9 @@
       $('#books-present').show();
       loadBookList(books);
     }
+
+    $('#overdue-number').text(returns.overdue);
+    $('#successful-number').text(returns.successful);
 
   }
 
@@ -231,8 +288,8 @@
       row.appendChild(issueYearCell);
 
       const overdueCell = document.createElement('td');
-      overdueCell.textContent = book.overdue === 'yes' ? 'yes' : 'no';
-      if (book.overdue === 'yes') {
+      overdueCell.textContent = book.overdue ? 'yes' : 'no';
+      if (book.overdue) {
         overdueCell.style.color = 'red';
       } else {
         overdueCell.style.color = 'green';
@@ -243,7 +300,11 @@
     });
   }
 
-
+  function displayMessageInModal(message) {
+    const customAlertText = $('#customAlertText');
+    customAlertText.text(message);
+    $('#customAlertModal').modal('show');
+  }
 
   function deletePerson() {
     if (confirm(`Are you sure you want to remove a person from the ID ${personId}?`)) {
@@ -251,7 +312,7 @@
         type: 'DELETE',
         url: `http://localhost:8080/people/${personId}`,
         success: function () {
-          alert(`The person with ID ${personId} has been successfully deleted.`);
+          displayMessageInModal(`The person with ID ${personId} has been successfully deleted.`);
           location.href = 'http://localhost:9091/people/';
         },
         error: function (xhr, status, error) {

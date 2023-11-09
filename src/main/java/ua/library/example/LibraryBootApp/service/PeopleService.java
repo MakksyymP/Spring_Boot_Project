@@ -6,13 +6,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.library.example.LibraryBootApp.dto.people.RequestPersonDto;
-import ua.library.example.LibraryBootApp.models.Book;
 import ua.library.example.LibraryBootApp.models.Person;
 import ua.library.example.LibraryBootApp.repositories.PeopleRepositories;
 
 import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -22,16 +20,19 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class PeopleService {
     private final PeopleRepositories peopleRepositories;
+    private final SuccessfulReturnsService returnsService;
 
     @Autowired
-    public PeopleService(PeopleRepositories peopleRepositories) {
+    public PeopleService(PeopleRepositories peopleRepositories, SuccessfulReturnsService successfulReturnsService) {
         this.peopleRepositories = peopleRepositories;
+        this.returnsService = successfulReturnsService;
     }
 
     public Page<Person> index(Pageable pageable) {
         return peopleRepositories.findAll(pageable);
     }
 
+    @Transactional
     public Person show(int id) {
         Optional<Person> foundPerson = peopleRepositories.findById(id);
 
@@ -48,6 +49,7 @@ public class PeopleService {
         person.setName(dto.getName());
         person.setYear(dto.getYear());
 
+        returnsService.createReturn(person);
         peopleRepositories.save(person);
     }
 
@@ -60,23 +62,6 @@ public class PeopleService {
     @Transactional
     public void delete(int id) {
         peopleRepositories.deleteById(id);
-    }
-
-    public List<Book> showAllPersonalBooks(int personId) {
-        List<Book> allBooks = show(personId).getBooks();
-
-        allBooks.forEach(this::checkOverdue);
-        return allBooks;
-    }
-
-    private void checkOverdue(Book book) {
-        int bookLoanPeriod = 2;
-        LocalDateTime orderTime = book.getTime();
-        LocalDateTime twoWeeksAgo = LocalDateTime.now().minusWeeks(bookLoanPeriod);
-
-        if (orderTime.isBefore(twoWeeksAgo)) {
-            book.setOverdue(true);
-        }
     }
 
     public Optional<Person> getPersonByName(String name){

@@ -25,6 +25,9 @@ public class Book {
     @Column(name = "order_time")
     private LocalDateTime orderTime;
 
+    @Column(name = "loan_duration_weeks")
+    private int loanDurationWeeks;
+
     @ManyToOne
     @JoinColumn(name = "person_id", referencedColumnName = "id")
     private Person owner;
@@ -89,11 +92,19 @@ public class Book {
         this.orderTime = orderTime;
     }
 
+    public void setOverdue(boolean overdue) {
+        isOverdue = overdue;
+    }
+
     public boolean isOverdue() {
         return isOverdue;
     }
 
-    public void setOverdue(boolean overdue) {
-        isOverdue = overdue;
+    public int getLoanDurationWeeks() {
+        return loanDurationWeeks;
+    }
+
+    public void setLoanDurationWeeks(int loanDurationWeeks) {
+        this.loanDurationWeeks = loanDurationWeeks;
     }
 }
