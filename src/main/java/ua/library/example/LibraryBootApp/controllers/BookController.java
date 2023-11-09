@@ -31,7 +31,7 @@ public class BookController {
     private final BooksService booksService;
 
     @Autowired
-    public BookController(BooksService booksService, PeopleService peopleService) {
+    public BookController(BooksService booksService) {
         this.booksService = booksService;
     }
 
@@ -98,8 +98,9 @@ public class BookController {
     }
 
     @PatchMapping("{id}/get")
-    public ResponseEntity<?> getBook(@PathVariable("id") int bookId, @RequestParam("personId") int personId) {
-        booksService.getBook(bookId, personId);
+    public ResponseEntity<?> getBook(@PathVariable("id") int bookId, @RequestParam("personId") int personId,
+                                     @RequestParam(value = "loanPeriod", defaultValue = "1") int loanPeriod) {
+        booksService.getBook(bookId, personId, loanPeriod);
         return new ResponseEntity<>("Book was got", HttpStatus.OK);
     }
 

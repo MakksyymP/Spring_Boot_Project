@@ -6,8 +6,14 @@
 
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://bootswatch.com/4/darkly/bootstrap.min.css" rel="stylesheet">
+    <link rel="shortcut icon" href="../img/search.png">
+
 </head>
 <style>
+    body {
+        color: #ccc;
+    }
+
     .container {
         display: flex;
         justify-content: center;
@@ -121,8 +127,8 @@
                         <th>Title</th>
                         <th>Author</th>
                         <th>Issue Year</th>
+                        <th>Loan Period</th>
                         <th>Is Busy</th>
-                        <th>Action</th>
                     </tr>
                     </thead>
                     <tbody id="bookInfoTableBody">
@@ -140,7 +146,8 @@
                         <th>ID</th>
                         <th>Name</th>
                         <th>Birth Year</th>
-                        <th>Action</th>
+                        <th>Successful Returns</th>
+                        <th>Overdue Returns</th>
                     </tr>
                     </thead>
                     <tbody id="personInfoTableBody">
@@ -153,6 +160,25 @@
     </div>
 </div>
 
+
+<div class="modal" id="customAlertModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Notifications</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="customAlertText">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -161,7 +187,8 @@
     $(document).ready(function() {
         $("input[type='text']").val("");
 
-        $('.change-type').click(function () {
+        $('.change-type').click(function (event) {
+            event.preventDefault();
             const type = $(this).data("type");
             $('#search-type-input').val(type);
 
@@ -173,7 +200,7 @@
             if (type === 'book') {
                 imageSrc = "../img/books.png";
             } else if (type === 'person') {
-                imageSrc = "../img/person.png";
+                imageSrc = "../img/people.png";
             } else {
                 imageSrc = "../img/hz.png";
             }
@@ -191,7 +218,7 @@
                 const personName = $("#searchInput").val();
                 getPerson(personName);
             } else {
-                displayMessage(`Choose search type`, 'alert-danger')
+                displayMessageInModal(`Please choose search type`);
             }
 
         });
@@ -216,12 +243,12 @@
                     data.forEach(function(book) {
                         const row = `
                         <tr>
-                            <td>${book.id}</td>
+                            <td><a class="read-more" href="http://localhost:9091/books/show.html?id=${book.id}">${book.id}</a></td>
                             <td>${book.name}</td>
                             <td>${book.author}</td>
                             <td>${book.year}</td>
+                            <td>${book.loanDurationWeeks} weeks</td>
                             <td style="color: ${book.isBusy ? 'red' : 'green'}">${book.isBusy ? 'Yes' : 'No'}</td>
-                            <td><a class="btn btn-primary read-more" href="http://localhost:9091/books/show.html?id=${book.id}">Info...</a></td>
                         </tr>
                     `;
                         bookInfoTableBody.append(row);
@@ -258,10 +285,11 @@
                     data.forEach(function(person) {
                         const row = `
                         <tr>
-                            <td>${person.id}</td>
+                            <td><a class="read-more" href="http://localhost:9091/people/show.html?id=${person.id}">${person.id}</a></td>
                             <td>${person.name}</td>
                             <td>${person.year}</td>
-                            <td><a class="btn btn-primary read-more" href="http://localhost:9091/people/show.html?id=${person.id}">Info...</a></td>
+                            <td style="color: green">${person.returns.successful}</td>
+                            <td style="color: red">${person.returns.overdue}</td>
                         </tr>
                     `;
                         personInfoTableBody.append(row);
@@ -279,12 +307,23 @@
         });
     }
 
+    function displayMessageInModal(message) {
+        const customAlertText = $('#customAlertText');
+        customAlertText.text(message);
+        $('#customAlertModal').modal('show');
+    }
+
     function displayMessage(message, alertClass) {
         const messageContainer = $('#message-container');
         messageContainer.text(message);
         messageContainer.removeClass('alert-success alert-danger').addClass(alertClass);
         messageContainer.show();
+
+        if (alertClass === 'alert-danger') {
+            displayMessageInModal(message);
+        }
     }
+
 
     function onBack() {
         window.history.back();

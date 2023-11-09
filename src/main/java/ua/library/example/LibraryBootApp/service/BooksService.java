@@ -10,6 +10,8 @@ import ua.library.example.LibraryBootApp.dto.books.RequestBookDto;
 import ua.library.example.LibraryBootApp.models.Book;
 import ua.library.example.LibraryBootApp.models.Person;
 import ua.library.example.LibraryBootApp.repositories.BooksRepositories;
+import ua.library.example.LibraryBootApp.utils.exceptions.BookLimitExceededException;
+import ua.library.example.LibraryBootApp.utils.exceptions.IrresponsibleUserException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,11 +22,13 @@ import java.util.Optional;
 public class BooksService {
     private final BooksRepositories booksRepositories;
     private final PeopleService peopleService;
+    private final SuccessfulReturnsService returnsService;
 
     @Autowired
-    public BooksService(BooksRepositories booksRepositories, PeopleService peopleService) {
+    public BooksService(BooksRepositories booksRepositories, PeopleService peopleService, SuccessfulReturnsService returnsService) {
         this.booksRepositories = booksRepositories;
         this.peopleService = peopleService;
+        this.returnsService = returnsService;
     }
 
     public Page<Book> index(Pageable pageable) {
@@ -61,35 +65,89 @@ public class BooksService {
     @Transactional
     public void returnBook(int id) {
         Book book = show(id);
+
+        checkOverdue(book, book.getPerson().getId());
         book.setPerson(null);
         book.setOrderTime(null);
+
         booksRepositories.save(book);
     }
 
     @Transactional
-    public void getBook(int bookId, int personId){
+    public void getBook(int bookId, int personId, int loanPeriod){
         Book book = show(bookId);
-        book.setPerson(peopleService.show(personId));
+
+        Person person = peopleService.show(personId);
+        checkBooksLimit(person);
+        validateUserResponsibility(person, loanPeriod);
+
+        book.setLoanDurationWeeks(loanPeriod);
+        book.setPerson(person);
         book.setOrderTime(LocalDateTime.now());
         booksRepositories.save(book);
-    }
-
-    public Person showOwner(int bookId) {
-        return show(bookId).getPerson();
-    }
-
-    private void checkOverdue(Book book) {
-        int bookLoanPeriod = 2;
-        LocalDateTime orderTime = book.getTime();
-        LocalDateTime twoWeeksAgo = LocalDateTime.now().minusWeeks(bookLoanPeriod);
-
-        if (orderTime.isBefore(twoWeeksAgo)) {
-            book.setOverdue(true); //TODO Добавити функцію записання не повернтутих книжок
-        }
     }
 
     public List<Book> searchByTitle(String title) {
         title = title.substring(0, 1).toUpperCase() + title.substring(1);
         return booksRepositories.findBookByNameStartingWith(title);
     }
+
+    private void checkOverdue(Book book, int personId) {
+        int bookLoanPeriod = book.getLoanDurationWeeks();
+        LocalDateTime orderTime = book.getTime();
+        LocalDateTime twoWeeksAgo = LocalDateTime.now().minusWeeks(bookLoanPeriod);
+
+        if (orderTime.isBefore(twoWeeksAgo)) {
+            returnsService.addToOverdue(personId);
+        } else {
+            returnsService.addToSuccessful(personId);
+        }
+    }
+
+    private void checkBooksLimit(Person person) {
+        List<Book> books = person.getBooks();
+        int maxSize = 5;
+
+        int overdueAmount = person.getReturns().getOverdue();
+        int successfulAmount = person.getReturns().getSuccessful();
+
+        if (successfulAmount > 20) {
+            maxSize = 10;
+        } else if (successfulAmount > 10) {
+            maxSize = 8;
+        } else if (successfulAmount > 5) {
+            maxSize = 6;
+        }
+
+        if (overdueAmount > 20) {
+            maxSize = 1;
+        } else if (overdueAmount > 10) {
+            maxSize = 3;
+        } else if (overdueAmount > 5) {
+            maxSize = 4;
+        }
+
+        if (books.size() >= maxSize) {
+            throw new BookLimitExceededException(maxSize);
+        }
+    }
+
+    private void validateUserResponsibility(Person person, int loanPeriod) {
+        int overdueAmount = person.getReturns().getOverdue();
+        int maxLimit = 4;
+
+        if (overdueAmount > 20) {
+            maxLimit = 1;
+        } else if (overdueAmount > 10) {
+            maxLimit = 2;
+        } else if (overdueAmount > 5) {
+            maxLimit = 3;
+        }
+
+        if (loanPeriod > maxLimit) {
+            throw new IrresponsibleUserException(maxLimit);
+        }
+
+    }
+
 }
